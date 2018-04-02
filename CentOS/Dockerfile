@@ -1,14 +1,14 @@
 FROM centos:7
 
-MAINTAINER Humble Chirammal hchiramm@redhat.com Mohamed Ashiq Liyazudeen mliyazud@redhat.com
+MAINTAINER Jeff Winn jwinn@redhat.com
 
 ENV container docker
 
 LABEL architecture="x86_64" \
-      name="gluster/gluster-centos" \
+      name="gluster/gluster-ganesha-centos" \
       version="3.12" \
-      vendor="CentOS Community" \
-      summary="This image has a running glusterfs service ( CentOS 7 + Gluster 3.12)" \
+      vendor="rvcbd" \
+      summary="This image has a running glusterfs service configured with ganesha ( CentOS 7 + Gluster 3.12)" \
       io.k8s.display-name="Gluster 3.12 based on CentOS 7" \
       io.k8s.description="Gluster Image is based on CentOS Image which is a scalable network filesystem. Using common off-the-shelf hardware, you can create large, distributed storage solutions for media streaming, data analysis, and other data- and bandwidth-intensive tasks." \
       description="Gluster Image is based on CentOS Image which is a scalable network filesystem. Using common off-the-shelf hardware, you can create large, distributed storage solutions for media streaming, data analysis, and other data- and bandwidth-intensive tasks." \
@@ -23,7 +23,7 @@ rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
 rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
 rm -f /lib/systemd/system/basic.target.wants/*;\
 rm -f /lib/systemd/system/anaconda.target.wants/*;\
-yum --setopt=tsflags=nodocs -y install nfs-utils attr iputils iproute openssh-server openssh-clients ntp rsync tar cronie sudo xfsprogs glusterfs glusterfs-server glusterfs-rdma glusterfs-geo-replication;yum clean all; \
+yum --setopt=tsflags=nodocs -y install nfs-utils attr iputils iproute openssh-server openssh-clients ntp rsync tar cronie sudo xfsprogs glusterfs glusterfs-server glusterfs-rdma glusterfs-geo-replication glusterfsapi glusterfs-ganesha nfs-ganesha nfs-ganesha-gluster;yum clean all; \
 sed -i '/Defaults    requiretty/c\#Defaults    requiretty' /etc/sudoers; \
 sed -i '/Port 22/c\Port 2222' /etc/ssh/sshd_config; \
 sed -i 's/Requires\=rpcbind\.service//g' /usr/lib/systemd/system/glusterd.service; \
@@ -45,7 +45,8 @@ systemctl disable nfs-server.service; \
 systemctl mask getty.target; \
 systemctl enable ntpd.service; \
 systemctl enable glusterd.service; \
-systemctl enable gluster-setup.service;
+systemctl enable gluster-setup.service; \
+systemctl enable nfs-ganesha;
 
 EXPOSE 2222 111 245 443 24007 2049 8080 6010 6011 6012 38465 38466 38468 38469 49152 49153 49154 49156 49157 49158 49159 49160 49161 49162
 
